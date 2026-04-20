@@ -9,6 +9,7 @@ import tenpo.api.calculation.mapper.CalculationResponseMapper;
 import tenpo.api.calculation.validation.CalculationValidation;
 import tenpo.api.common.handler.CommonHandler;
 import tenpo.domain.calculation.CalculationService;
+import tenpo.settings.HttpHeaderConstants;
 
 @Component
 public class CalculationHandler extends CommonHandler {
@@ -31,11 +32,19 @@ public class CalculationHandler extends CommonHandler {
     }
 
     public Mono<ServerResponse> calculate(ServerRequest request) {
-        return executeHandler(
+        String mockScenario = request.headers().firstHeader(HttpHeaderConstants.MOCK_SCENARIO);
+
+        Mono<ServerResponse> response = executeHandler(
                 Mono.defer(() -> calculationValidation.validateQueryParams(request))
                         .map(calculationDomainMapper::toModel)
                         .flatMap(calculationService::calculate)
                         .map(calculationResponseMapper::toResponse)
         );
+
+        if (mockScenario == null || mockScenario.isBlank()) {
+            return response;
+        }
+
+        return response.contextWrite(context -> context.put(HttpHeaderConstants.MOCK_SCENARIO, mockScenario));
     }
 }

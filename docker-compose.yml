@@ -83,7 +83,6 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       PERCENTAGE_BASE_URL: http://api-mocks:8080
-      PERCENTAGE_PATH: ${PERCENTAGE_PATH:-/external/percentage}
     ports:
       - "8080:8080"
     networks:

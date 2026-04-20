@@ -1,9 +1,13 @@
 {
-  "scenarioName": "percentage-retry-success",
-  "requiredScenarioState": "THIRD_ATTEMPT",
+  "priority": 1,
   "request": {
     "method": "GET",
-    "urlPath": "/external/percentage/retry-success"
+    "urlPath": "/external/percentage",
+    "headers": {
+      "X-Mock-Scenario": {
+        "equalTo": "success"
+      }
+    }
   },
   "response": {
     "status": 200,
