@@ -43,3 +43,15 @@ Si quieres defender escalabilidad real en la entrevista, conviene evolucionar a 
 - [openapi.yml](/Users/facevedo/Documents/challenge-tenpo/api-calculator/src/main/resources/static/openapi.yml)
 
 La documentacion se expone como archivo OpenAPI estatico para reducir dependencias runtime no esenciales del challenge.
+
+## Soporte de pruebas locales
+
+La API acepta el header opcional `X-Mock-Scenario` para pruebas locales e integracion con `api-mocks`.
+
+Escenarios soportados:
+
+- `success`
+- `retry-success`
+- `error`
+
+Si el header no se envia, el flujo sigue usando el comportamiento exitoso por defecto del mock.

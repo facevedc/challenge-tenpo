@@ -21,6 +21,7 @@ El skeleton inicial refleja una cultura de desarrollo empresarial que mantengo d
 - [API calculator](./api-calculator/README.md)
 - [PostgreSQL](./postgres/README.md)
 - [API mocks](./api-mocks/README.md)
+- [Postman](./postman/README.md)
 
 ## OpenAPI
 
@@ -41,6 +42,7 @@ Servicios previstos:
 - Mock porcentaje: `http://localhost:8081`
 - PostgreSQL: `localhost:5432`
 - Redis: `localhost:6379`
+- Postman assets: `./postman`
 
 ## Estrategia tecnica
 

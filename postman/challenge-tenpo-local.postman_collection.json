@@ -3,14 +3,31 @@
     "_postman_id": "de4c80fe-2fa1-4e77-a3bb-d26c95dba3d4",
     "name": "challenge-tenpo-local",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Coleccion local para probar la API del challenge Tenpo, el mock externo y endpoints de soporte."
+    "description": "Coleccion local para probar la API del challenge Tenpo, el mock externo y los escenarios por header."
   },
   "item": [
     {
-      "name": "API Calculator",
+      "name": "Soporte",
       "item": [
         {
           "name": "Health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('health responde 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('status UP', function () {",
+                  "    pm.expect(pm.response.json().status).to.eql('UP');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -27,103 +44,32 @@
           }
         },
         {
-          "name": "Calculate Happy Path",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
+          "name": "Reiniciar escenarios mock",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('reset mock responde 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
               }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/calculations?num1=5&num2=7",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "calculations"
-              ],
-              "query": [
-                {
-                  "key": "num1",
-                  "value": "5"
-                },
-                {
-                  "key": "num2",
-                  "value": "7"
-                }
-              ]
             }
-          }
-        },
-        {
-          "name": "Calculate Invalid Param",
+          ],
           "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
+            "method": "POST",
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/calculations?num1=abc&num2=7",
+              "raw": "{{mockBaseUrl}}/__admin/scenarios/reset",
               "host": [
-                "{{baseUrl}}"
+                "{{mockBaseUrl}}"
               ],
               "path": [
-                "api",
-                "v1",
-                "calculations"
-              ],
-              "query": [
-                {
-                  "key": "num1",
-                  "value": "abc"
-                },
-                {
-                  "key": "num2",
-                  "value": "7"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "History",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/history?page=0&size=20",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "20"
-                }
+                "__admin",
+                "scenarios",
+                "reset"
               ]
             }
           }
@@ -131,41 +77,299 @@
       ]
     },
     {
-      "name": "API Mocks",
+      "name": "Escenarios Calculo",
       "item": [
         {
-          "name": "Percentage Success",
+          "name": "Flujo Exitoso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('flujo exitoso responde 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('resultado esperado del flujo exitoso', function () {",
+                  "    pm.expect(json.num1).to.eql(5);",
+                  "    pm.expect(json.num2).to.eql(7);",
+                  "    pm.expect(json.base_sum).to.eql(12);",
+                  "    pm.expect(json.percentage).to.eql(10);",
+                  "    pm.expect(json.final_amount).to.eql(13.2);",
+                  "    pm.expect(json.percentage_source).to.eql('external-mock');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "success",
+                "type": "text"
+              }
+            ],
             "url": {
-              "raw": "{{mockBaseUrl}}/external/percentage",
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
               "host": [
-                "{{mockBaseUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
-                "external",
-                "percentage"
+                "api",
+                "v1",
+                "calculations"
+              ],
+              "query": [
+                {
+                  "key": "num1",
+                  "value": "{{num1}}"
+                },
+                {
+                  "key": "num2",
+                  "value": "{{num2}}"
+                }
               ]
             }
           }
         },
         {
-          "name": "Percentage Error",
+          "name": "Retry Exitoso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('retry exitoso responde 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('retry termina usando fuente externa', function () {",
+                  "    pm.expect(json.percentage_source).to.eql('external-mock');",
+                  "    pm.expect(json.percentage).to.eql(10);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "retry-success",
+                "type": "text"
+              }
+            ],
             "url": {
-              "raw": "{{mockBaseUrl}}/external/percentage/error",
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
               "host": [
-                "{{mockBaseUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
-                "external",
-                "percentage",
-                "error"
+                "api",
+                "v1",
+                "calculations"
+              ],
+              "query": [
+                {
+                  "key": "num1",
+                  "value": "{{num1}}"
+                },
+                {
+                  "key": "num2",
+                  "value": "{{num2}}"
+                }
               ]
             }
+          }
+        },
+        {
+          "name": "Sembrar Cache Para Fallback",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('siembra de cache responde 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "success",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calculations"
+              ],
+              "query": [
+                {
+                  "key": "num1",
+                  "value": "{{num1}}"
+                },
+                {
+                  "key": "num2",
+                  "value": "{{num2}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Fallback Con Cache",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('fallback con cache responde 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('fallback usa redis-cache', function () {",
+                  "    pm.expect(json.percentage_source).to.eql('redis-cache');",
+                  "    pm.expect(json.percentage).to.eql(10);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "error",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calculations"
+              ],
+              "query": [
+                {
+                  "key": "num1",
+                  "value": "{{num1}}"
+                },
+                {
+                  "key": "num2",
+                  "value": "{{num2}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Fallback Sin Cache",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('fallback sin cache responde 503', function () {",
+                  "    pm.response.to.have.status(503);",
+                  "});",
+                  "",
+                  "pm.test('mensaje esperado sin cache previa', function () {",
+                  "    pm.expect(json.code).to.eql('SERVICE_UNAVAILABLE');",
+                  "    pm.expect(json.message).to.eql('Percentage service unavailable and no cached value found');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "error",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calculations"
+              ],
+              "query": [
+                {
+                  "key": "num1",
+                  "value": "{{num1}}"
+                },
+                {
+                  "key": "num2",
+                  "value": "{{num2}}"
+                }
+              ]
+            },
+            "description": "Antes de ejecutar este request, limpia Redis con ./scripts/reset_percentage_cache.sh"
           }
         }
       ]
@@ -179,6 +383,14 @@
     {
       "key": "mockBaseUrl",
       "value": "http://localhost:8081"
+    },
+    {
+      "key": "num1",
+      "value": "5"
+    },
+    {
+      "key": "num2",
+      "value": "7"
     }
   ]
 }
