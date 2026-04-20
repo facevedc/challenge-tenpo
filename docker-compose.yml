@@ -19,7 +19,6 @@ services:
     networks:
       - challenge-net
     deploy:
-      replicas: 1
       resources:
         limits:
           cpus: "0.50"
@@ -36,7 +35,6 @@ services:
     networks:
       - challenge-net
     deploy:
-      replicas: 1
       resources:
         limits:
           cpus: "0.25"
@@ -58,7 +56,6 @@ services:
     networks:
       - challenge-net
     deploy:
-      replicas: 1
       resources:
         limits:
           cpus: "0.25"
