@@ -25,7 +25,6 @@ class DefaultCalculationServiceTest {
     @Test
     void shouldReturnCalculationResultWithDynamicPercentage() {
         when(percentageProvider.getPercentage()).thenReturn(Mono.just(new BigDecimal("10")));
-
         StepVerifier.create(
                 defaultCalculationService.calculate(
                         new CalculationCommand(new BigDecimal("5"), new BigDecimal("7")))
