@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import tenpo.domain.calculation.model.CalculationCommand;
 import tenpo.domain.calculation.model.CalculationResult;
+import tenpo.domain.calculation.model.PercentageResult;
 
 @Service
 public class DefaultCalculationService implements CalculationService {
@@ -21,13 +22,13 @@ public class DefaultCalculationService implements CalculationService {
     public Mono<CalculationResult> calculate(CalculationCommand calculationCommand) {
         BigDecimal baseSum = calculationCommand.num1().add(calculationCommand.num2());
         return percentageProvider.getPercentage()
-                .map(percentage -> new CalculationResult(
+                .map(percentageResult -> new CalculationResult(
                         calculationCommand.num1(),
                         calculationCommand.num2(),
                         baseSum,
-                        percentage,
-                        applyPercentage(baseSum, percentage),
-                        "external-mock"
+                        percentageResult.percentage(),
+                        applyPercentage(baseSum, percentageResult.percentage()),
+                        percentageResult.source()
                 ));
     }
 

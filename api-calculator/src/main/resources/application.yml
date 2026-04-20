@@ -33,7 +33,9 @@ tenpo:
   client:
     percentage:
       base-url: ${PERCENTAGE_BASE_URL:http://localhost:8081}
-      path: /external/percentage
+      path: ${PERCENTAGE_PATH:/external/percentage}
+      max-attempts: 3
+      retry-delay-millis: 100
   cache:
     percentage-ttl-minutes: 30
   rate-limit:
