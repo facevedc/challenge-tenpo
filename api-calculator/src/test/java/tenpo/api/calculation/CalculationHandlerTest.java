@@ -23,6 +23,7 @@ import tenpo.domain.calculation.CalculationService;
 import tenpo.domain.calculation.exception.PercentageUnavailableException;
 import tenpo.domain.calculation.model.CalculationCommand;
 import tenpo.domain.calculation.model.CalculationResult;
+import tenpo.settings.HttpHeaderConstants;
 import tenpo.settings.JacksonConfig;
 import tenpo.settings.RouterConfig;
 import tenpo.settings.SwaggerConfig;
@@ -78,6 +79,54 @@ class CalculationHandlerTest {
                 .jsonPath("$.base_sum").isEqualTo(12)
                 .jsonPath("$.percentage").isEqualTo(10)
                 .jsonPath("$.final_amount").isEqualTo(13.2)
+                .jsonPath("$.percentage_source").isEqualTo("external-mock");
+    }
+
+    @Test
+    void shouldSupportMockScenarioHeaderForLocalTests() {
+        when(calculationService.calculate(new CalculationCommand(new BigDecimal("5"), new BigDecimal("7"))))
+                .thenReturn(Mono.just(new CalculationResult(
+                        new BigDecimal("5"),
+                        new BigDecimal("7"),
+                        new BigDecimal("12"),
+                        new BigDecimal("10"),
+                        new BigDecimal("13.2"),
+                        "external-mock"
+                )));
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/api/v1/calculations")
+                        .queryParam("num1", "5")
+                        .queryParam("num2", "7")
+                        .build())
+                .header(HttpHeaderConstants.MOCK_SCENARIO, "success")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.percentage_source").isEqualTo("external-mock");
+    }
+
+    @Test
+    void shouldIgnoreBlankMockScenarioHeader() {
+        when(calculationService.calculate(new CalculationCommand(new BigDecimal("5"), new BigDecimal("7"))))
+                .thenReturn(Mono.just(new CalculationResult(
+                        new BigDecimal("5"),
+                        new BigDecimal("7"),
+                        new BigDecimal("12"),
+                        new BigDecimal("10"),
+                        new BigDecimal("13.2"),
+                        "external-mock"
+                )));
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/api/v1/calculations")
+                        .queryParam("num1", "5")
+                        .queryParam("num2", "7")
+                        .build())
+                .header(HttpHeaderConstants.MOCK_SCENARIO, "")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
                 .jsonPath("$.percentage_source").isEqualTo("external-mock");
     }
 
