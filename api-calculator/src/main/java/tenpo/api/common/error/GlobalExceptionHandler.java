@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import tenpo.api.common.exception.BadRequestException;
+import tenpo.domain.calculation.exception.PercentageUnavailableException;
 
 @Component
 public class GlobalExceptionHandler {
@@ -14,6 +15,8 @@ public class GlobalExceptionHandler {
     public Mono<ServerResponse> handle(Throwable throwable) {
         HttpStatus status = throwable instanceof BadRequestException
                 ? HttpStatus.BAD_REQUEST
+                : throwable instanceof PercentageUnavailableException
+                ? HttpStatus.SERVICE_UNAVAILABLE
                 : HttpStatus.INTERNAL_SERVER_ERROR;
 
         return ServerResponse.status(status)

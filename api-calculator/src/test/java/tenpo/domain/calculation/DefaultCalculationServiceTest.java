@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tenpo.domain.calculation.model.CalculationCommand;
 import tenpo.domain.calculation.model.CalculationResult;
+import tenpo.domain.calculation.model.PercentageResult;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultCalculationServiceTest {
@@ -24,7 +25,10 @@ class DefaultCalculationServiceTest {
 
     @Test
     void shouldReturnCalculationResultWithDynamicPercentage() {
-        when(percentageProvider.getPercentage()).thenReturn(Mono.just(new BigDecimal("10")));
+        when(percentageProvider.getPercentage()).thenReturn(Mono.just(new PercentageResult(
+                new BigDecimal("10"),
+                "external-mock"
+        )));
         StepVerifier.create(
                 defaultCalculationService.calculate(
                         new CalculationCommand(new BigDecimal("5"), new BigDecimal("7")))

@@ -1,9 +1,9 @@
 package tenpo.domain.calculation;
 
-import java.math.BigDecimal;
 import reactor.core.publisher.Mono;
+import tenpo.domain.calculation.model.PercentageResult;
 
 public interface PercentageProvider {
 
-    Mono<BigDecimal> getPercentage();
+    Mono<PercentageResult> getPercentage();
 }
