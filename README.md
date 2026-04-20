@@ -17,15 +17,15 @@ El skeleton inicial refleja una cultura de desarrollo empresarial que mantengo d
 
 ## Documentacion por modulo
 
-- [API calculator](/Users/facevedo/Documents/challenge-tenpo/api-calculator/README.md)
-- [PostgreSQL](/Users/facevedo/Documents/challenge-tenpo/postgres/README.md)
-- [API mocks](/Users/facevedo/Documents/challenge-tenpo/api-mocks/README.md)
+- [API calculator](./api-calculator/README.md)
+- [PostgreSQL](./postgres/README.md)
+- [API mocks](./api-mocks/README.md)
 
 ## OpenAPI
 
 El contrato inicial vive en:
 
-- [openapi.yml](/Users/facevedo/Documents/challenge-tenpo/api-calculator/src/main/resources/static/openapi.yml)
+- [openapi.yml](./api-calculator/src/main/resources/static/openapi.yml)
 
 ## Levante local
 
