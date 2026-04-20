@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: Tenpo Challenge Calculator API
+  version: 1.0.0
+  description: API REST reactiva para calcular suma con porcentaje dinamico e historial de llamadas.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/calculations:
+    get:
+      summary: Calcula la suma de dos numeros aplicando un porcentaje adicional
+      parameters:
+        - in: query
+          name: num1
+          required: true
+          schema:
+            type: number
+            format: double
+        - in: query
+          name: num2
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: Resultado del calculo
+        '400':
+          description: Parametros invalidos
+        '429':
+          description: Rate limit excedido
+        '500':
+          description: Error interno
+  /api/v1/history:
+    get:
+      summary: Consulta paginada del historial de invocaciones
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Historial paginado
+

@@ -1,0 +1,7 @@
+spring:
+  main:
+    web-application-type: reactive
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:tenpo_challenge}
+    username: ${DB_USERNAME:tenpo}
+    password: ${DB_PASSWORD:tenpo_secret}
