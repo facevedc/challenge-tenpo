@@ -20,6 +20,30 @@ Respuesta esperada inicial:
 
 ## Casos pensados para pruebas
 
-- escenario exitoso con porcentaje fijo
-- escenario de error para validar retries y fallback a cache
+- escenario `success`
+- escenario `retry-success`
+- escenario `error`
 
+## Seleccion de escenario por header
+
+El mock cambia su comportamiento segun el header opcional:
+
+- `X-Mock-Scenario: success`
+- `X-Mock-Scenario: retry-success`
+- `X-Mock-Scenario: error`
+
+Si no se envia el header, responde el escenario exitoso por defecto.
+
+## Reinicio de escenarios
+
+Para reiniciar el estado de WireMock:
+
+```bash
+curl -X POST http://localhost:8081/__admin/scenarios/reset
+```
+
+O bien:
+
+```bash
+./scripts/reset_mock_scenarios.sh
+```
