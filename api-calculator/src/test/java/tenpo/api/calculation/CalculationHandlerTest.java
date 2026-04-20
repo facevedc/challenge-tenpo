@@ -20,6 +20,7 @@ import tenpo.api.calculation.validation.CalculationValidation;
 import tenpo.api.common.error.GlobalExceptionHandler;
 import tenpo.api.history.handler.HistoryHandler;
 import tenpo.domain.calculation.CalculationService;
+import tenpo.domain.calculation.exception.PercentageUnavailableException;
 import tenpo.domain.calculation.model.CalculationCommand;
 import tenpo.domain.calculation.model.CalculationResult;
 import tenpo.settings.JacksonConfig;
@@ -105,5 +106,24 @@ class CalculationHandlerTest {
                 .expectBody()
                 .jsonPath("$.code").isEqualTo("BAD_REQUEST")
                 .jsonPath("$.message").isEqualTo("num1 is required");
+    }
+
+    @Test
+    void shouldReturnServiceUnavailableWhenPercentageIsNotAvailable() {
+        when(calculationService.calculate(new CalculationCommand(new BigDecimal("5"), new BigDecimal("7"))))
+                .thenReturn(Mono.error(new PercentageUnavailableException(
+                        "Percentage service unavailable and no cached value found"
+                )));
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/api/v1/calculations")
+                        .queryParam("num1", "5")
+                        .queryParam("num2", "7")
+                        .build())
+                .exchange()
+                .expectStatus().isEqualTo(503)
+                .expectBody()
+                .jsonPath("$.code").isEqualTo("SERVICE_UNAVAILABLE")
+                .jsonPath("$.message").isEqualTo("Percentage service unavailable and no cached value found");
     }
 }

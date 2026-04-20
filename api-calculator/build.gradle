@@ -46,12 +46,8 @@ def coverageExclusions = [
     'tenpo/*Application.class',
     'tenpo/settings/**',
     'tenpo/api/common/**',
-    'tenpo/api/package-info.class',
     'tenpo/api/**/dto/**',
-    'tenpo/domain/package-info.class',
-    'tenpo/domain/**/model/**',
-    'tenpo/infrastructure/package-info.class',
-    'tenpo/settings/package-info.class'
+    'tenpo/domain/**/model/**'
 ]
 
 test {

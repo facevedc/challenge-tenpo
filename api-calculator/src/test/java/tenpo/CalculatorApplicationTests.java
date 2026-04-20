@@ -2,6 +2,8 @@ package tenpo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(properties = {
         "spring.autoconfigure.exclude=" +
@@ -12,6 +14,9 @@ import org.springframework.boot.test.context.SpringBootTest;
                 "org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration"
 })
 class CalculatorApplicationTests {
+
+    @MockitoBean
+    private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
 
     @Test
     void contextLoads() {
