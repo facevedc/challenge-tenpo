@@ -5,3 +5,7 @@ spring:
     url: r2dbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:tenpo_challenge}
     username: ${DB_USERNAME:tenpo}
     password: ${DB_PASSWORD:tenpo_secret}
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}

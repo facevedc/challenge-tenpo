@@ -25,6 +25,10 @@ paths:
       responses:
         '200':
           description: Resultado del calculo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationResponse'
         '400':
           description: Parametros invalidos
         '429':
@@ -48,4 +52,62 @@ paths:
       responses:
         '200':
           description: Historial paginado
-
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryResponse'
+components:
+  schemas:
+    CalculationResponse:
+      type: object
+      properties:
+        num1:
+          type: number
+          format: double
+        num2:
+          type: number
+          format: double
+        base_sum:
+          type: number
+          format: double
+        percentage:
+          type: number
+          format: double
+        final_amount:
+          type: number
+          format: double
+        percentage_source:
+          type: string
+    HistoryEntryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+        endpoint:
+          type: string
+        http_method:
+          type: string
+        request_summary:
+          type: string
+        outcome:
+          type: string
+    HistoryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryEntryResponse'
+        page:
+          type: integer
+        size:
+          type: integer
+        total_elements:
+          type: integer
+          format: int64
+        total_pages:
+          type: integer

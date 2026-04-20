@@ -44,6 +44,29 @@ services:
           cpus: "0.25"
           memory: 256M
 
+  redis:
+    image: redis:7.4.2-alpine
+    container_name: challenge-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - challenge-net
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+
   api-calculator:
     build:
       context: ./api-calculator
@@ -51,6 +74,8 @@ services:
     restart: unless-stopped
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       api-mocks:
         condition: service_started
@@ -62,6 +87,8 @@ services:
       DB_NAME: tenpo_challenge
       DB_USERNAME: tenpo
       DB_PASSWORD: tenpo_secret
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       PERCENTAGE_BASE_URL: http://api-mocks:8080
     ports:
       - "8080:8080"
@@ -76,6 +103,7 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   challenge-net:
