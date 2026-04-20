@@ -27,7 +27,7 @@ info:
   app:
     name: ${spring.application.name}
     description: API reactiva para challenge Tenpo
-    version: 1.0.0
+    version: 1.0.0-bootstrap
 
 tenpo:
   client:

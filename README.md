@@ -1,12 +1,13 @@
 # challenge-tenpo
 
-Monorepo para resolver el challenge de Tenpo con Java 21, Spring Boot WebFlux y PostgreSQL.
+Monorepo para resolver el challenge de Tenpo con Java 21, Spring Boot WebFlux, PostgreSQL y Redis.
 
 ## Estructura
 
 - `api-calculator`: API principal del challenge.
 - `postgres`: inicializacion y documentacion de la base de datos.
 - `api-mocks`: mocks del servicio externo de porcentaje.
+- `redis`: cache distribuido y soporte de rate limit.
 - `docker-compose.yml`: orquestacion local de servicios.
 
 ## Estado
@@ -39,12 +40,21 @@ Servicios previstos:
 - OpenAPI YAML: `http://localhost:8080/openapi.yml`
 - Mock porcentaje: `http://localhost:8081`
 - PostgreSQL: `localhost:5432`
+- Redis: `localhost:6379`
 
 ## Estrategia tecnica
 
 - WebFlux obligatorio para el bonus y para mantener el flujo no bloqueante.
 - R2DBC + PostgreSQL para historial de llamadas.
-- Cache local simple con Caffeine solo sirve bien en despliegue single replica.
-- Si el challenge enfatiza replicas, lo correcto es migrar cache y rate limit a un store compartido, idealmente Redis.
-- Rate limit en la API con filtro reactivo. Para replicas reales, conviene algoritmo distribuido respaldado por Redis.
+- Redis como base de cache distribuido y soporte para rate limit consistente entre replicas.
+- Rate limit implementado en la API para mantener el alcance acotado, usando Redis como store compartido.
 - Registro de historial desacoplado y asincrono para no impactar la latencia del endpoint principal.
+
+## Flujo de desarrollo
+
+- `main`: rama estable de presentacion y entrega.
+- `develop`: rama de integracion.
+- `feature/*`: ramas de trabajo por bloque funcional.
+- Los PR deben apuntar a `develop`.
+- La estrategia de merge definida es `Squash and merge` para mantener un historial limpio y coherente.
+- Cada PR debe pasar el workflow de `pull_request` antes de integrarse.

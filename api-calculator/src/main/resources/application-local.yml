@@ -5,3 +5,7 @@ spring:
     url: r2dbc:postgresql://localhost:5432/tenpo_challenge
     username: tenpo
     password: tenpo_secret
+  data:
+    redis:
+      host: localhost
+      port: 6379
