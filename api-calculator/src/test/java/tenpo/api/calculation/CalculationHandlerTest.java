@@ -59,9 +59,9 @@ class CalculationHandlerTest {
                         new BigDecimal("5"),
                         new BigDecimal("7"),
                         new BigDecimal("12"),
-                        BigDecimal.ZERO,
-                        new BigDecimal("12"),
-                        "bootstrap"
+                        new BigDecimal("10"),
+                        new BigDecimal("13.2"),
+                        "external-mock"
                 )));
 
         webTestClient.get()
@@ -75,9 +75,9 @@ class CalculationHandlerTest {
                 .jsonPath("$.num1").isEqualTo(5)
                 .jsonPath("$.num2").isEqualTo(7)
                 .jsonPath("$.base_sum").isEqualTo(12)
-                .jsonPath("$.percentage").isEqualTo(0)
-                .jsonPath("$.final_amount").isEqualTo(12)
-                .jsonPath("$.percentage_source").isEqualTo("bootstrap");
+                .jsonPath("$.percentage").isEqualTo(10)
+                .jsonPath("$.final_amount").isEqualTo(13.2)
+                .jsonPath("$.percentage_source").isEqualTo("external-mock");
     }
 
     @Test

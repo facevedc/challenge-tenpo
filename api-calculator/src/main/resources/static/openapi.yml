@@ -29,6 +29,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CalculationResponse'
+              example:
+                num1: 5
+                num2: 7
+                base_sum: 12
+                percentage: 10
+                final_amount: 13.2
+                percentage_source: external-mock
         '400':
           description: Parametros invalidos
         '429':
@@ -78,6 +85,13 @@ components:
           format: double
         percentage_source:
           type: string
+      example:
+        num1: 5
+        num2: 7
+        base_sum: 12
+        percentage: 10
+        final_amount: 13.2
+        percentage_source: external-mock
     HistoryEntryResponse:
       type: object
       properties:

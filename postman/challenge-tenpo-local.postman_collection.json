@@ -1,0 +1,184 @@
+{
+  "info": {
+    "_postman_id": "de4c80fe-2fa1-4e77-a3bb-d26c95dba3d4",
+    "name": "challenge-tenpo-local",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleccion local para probar la API del challenge Tenpo, el mock externo y endpoints de soporte."
+  },
+  "item": [
+    {
+      "name": "API Calculator",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Calculate Happy Path",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1=5&num2=7",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calculations"
+              ],
+              "query": [
+                {
+                  "key": "num1",
+                  "value": "5"
+                },
+                {
+                  "key": "num2",
+                  "value": "7"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Calculate Invalid Param",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1=abc&num2=7",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calculations"
+              ],
+              "query": [
+                {
+                  "key": "num1",
+                  "value": "abc"
+                },
+                {
+                  "key": "num2",
+                  "value": "7"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/history?page=0&size=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Mocks",
+      "item": [
+        {
+          "name": "Percentage Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mockBaseUrl}}/external/percentage",
+              "host": [
+                "{{mockBaseUrl}}"
+              ],
+              "path": [
+                "external",
+                "percentage"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Percentage Error",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mockBaseUrl}}/external/percentage/error",
+              "host": [
+                "{{mockBaseUrl}}"
+              ],
+              "path": [
+                "external",
+                "percentage",
+                "error"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "mockBaseUrl",
+      "value": "http://localhost:8081"
+    }
+  ]
+}

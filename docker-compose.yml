@@ -1,14 +1,13 @@
 services:
   postgres:
     image: postgres:17.9-alpine3.23
-    container_name: challenge-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: tenpo_challenge
       POSTGRES_USER: tenpo
       POSTGRES_PASSWORD: tenpo_secret
     ports:
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d:ro
@@ -28,7 +27,6 @@ services:
 
   api-mocks:
     image: wiremock/wiremock:3.9.1
-    container_name: challenge-api-mocks
     restart: unless-stopped
     command: ["--port", "8080", "--global-response-templating"]
     ports:
@@ -46,7 +44,6 @@ services:
 
   redis:
     image: redis:7.4.2-alpine
-    container_name: challenge-redis
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     ports:
@@ -70,7 +67,6 @@ services:
   api-calculator:
     build:
       context: ./api-calculator
-    container_name: challenge-api-calculator
     restart: unless-stopped
     depends_on:
       postgres:
