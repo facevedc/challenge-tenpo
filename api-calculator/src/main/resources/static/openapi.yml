@@ -68,7 +68,7 @@ paths:
               example:
                 status: 400
                 code: BAD_REQUEST
-                message: Invalid decimal query param: num1
+                message: 'Invalid decimal query param: num1'
                 errors: []
         '429':
           description: Rate limit excedido en Nginx
@@ -79,7 +79,7 @@ paths:
               example:
                 status: 429
                 code: TOO_MANY_REQUESTS
-                message: Rate limit exceeded. Maximum 3 requests per minute.
+                message: 'Rate limit exceeded. Maximum 3 requests per minute.'
                 errors: []
         '503':
           description: Dependencia externa, cache o persistencia no disponible
@@ -101,7 +101,7 @@ paths:
               example:
                 status: 500
                 code: INTERNAL_SERVER_ERROR
-                message: Internal server error
+                message: 'Internal server error'
                 errors: []
   /api/v1/history:
     get:
@@ -171,7 +171,7 @@ paths:
               example:
                 status: 429
                 code: TOO_MANY_REQUESTS
-                message: Rate limit exceeded. Maximum 3 requests per minute.
+                message: 'Rate limit exceeded. Maximum 3 requests per minute.'
                 errors: []
         '503':
           description: Persistencia no disponible
@@ -182,7 +182,7 @@ paths:
               example:
                 status: 503
                 code: SERVICE_UNAVAILABLE
-                message: Persistence service temporarily unavailable
+                message: 'Persistence service temporarily unavailable'
                 errors: []
         '500':
           description: Error interno no controlado
@@ -193,7 +193,7 @@ paths:
               example:
                 status: 500
                 code: INTERNAL_SERVER_ERROR
-                message: Internal server error
+                message: 'Internal server error'
                 errors: []
 components:
   schemas:

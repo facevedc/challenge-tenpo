@@ -33,6 +33,8 @@ El repositorio parte desde un skeleton propio, alineado a una cultura de desarro
 
 ## Levantar el proyecto
 
+La forma esperada de ejecutar esta solucion es levantando el entorno completo con Docker Compose.
+
 ```bash
 docker compose pull api-calculator
 docker compose up -d
