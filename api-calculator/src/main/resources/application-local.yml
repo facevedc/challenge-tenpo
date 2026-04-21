@@ -2,7 +2,7 @@ spring:
   main:
     web-application-type: reactive
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/tenpo_challenge
+    url: r2dbc:postgresql://localhost:5432/tenpo_challenge?schema=tenpo
     username: tenpo
     password: tenpo_secret
   data:
