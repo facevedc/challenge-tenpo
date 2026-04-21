@@ -50,11 +50,9 @@ class DefaultPercentageProviderTest {
     @Test
     void shouldRetryUntilExternalPercentageSucceeds() {
         when(externalPercentageProvider.getPercentage())
-                .thenReturn(
-                        Mono.error(new RuntimeException("failure-1")),
-                        Mono.error(new RuntimeException("failure-2")),
-                        Mono.just(new BigDecimal("10"))
-                );
+                .thenReturn(Mono.error(new RuntimeException("failure-1")))
+                .thenReturn(Mono.error(new RuntimeException("failure-2")))
+                .thenReturn(Mono.just(new BigDecimal("10")));
         when(percentageCacheStore.savePercentage(new BigDecimal("10"))).thenReturn(Mono.empty());
 
         StepVerifier.create(defaultPercentageProvider.getPercentage())
