@@ -1,0 +1,24 @@
+{
+  "priority": 1,
+  "scenarioName": "percentage-retry-success",
+  "requiredScenarioState": "Started",
+  "newScenarioState": "SECOND_ATTEMPT",
+  "request": {
+    "method": "GET",
+    "urlPath": "/external/percentage",
+    "headers": {
+      "X-Mock-Scenario": {
+        "equalTo": "retry-success"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "message": "mock external service failure - first attempt"
+    }
+  }
+}

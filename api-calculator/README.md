@@ -1,45 +1,65 @@
 # api-calculator
 
-API principal del challenge.
+API reactiva principal del challenge.
 
 ## Stack
 
 - Java 21
-- Spring Boot 3
+- Spring Boot 3.5
 - Spring WebFlux
 - Spring Data R2DBC
+- Spring Data Redis Reactive
 - PostgreSQL
-- OpenAPI
-- Docker
+- Redis
 
 ## Capas
 
-- `api`: endpoints, DTOs, manejo HTTP y filtros.
-- `domain`: reglas de negocio, contratos y modelos.
-- `infrastructure`: adaptadores externos, persistencia y cache.
-- `setting`: configuracion de beans y propiedades.
+- `api`: handlers, DTOs, validaciones y manejo HTTP.
+- `domain`: casos de uso, contratos y modelos.
+- `infrastructure`: adaptadores concretos de cache, persistencia y cliente externo.
+- `settings`: configuracion de router, serializacion, WebClient y Redis.
 
-## Estado actual
+## Responsabilidades
 
-Esta primera iteracion deja el bootstrap tecnico del servicio y la estructura base para desarrollar los requerimientos del challenge por pasos.
+- exponer `GET /api/v1/calculations`
+- exponer `GET /api/v1/history`
+- integrar el porcentaje externo con retry y fallback
+- registrar historial asincrono
+- responder errores homogeneos
 
-## Nota sobre replicas
+## Ejecucion
 
-Caffeine es util para una primera implementacion local, pero no garantiza consistencia entre multiples replicas.
-Si quieres defender escalabilidad real en la entrevista, conviene evolucionar a Redis para:
-
-- cache compartido del porcentaje
-- rate limit distribuido
-- comportamiento consistente al escalar horizontalmente
-
-## Ejecucion local
+Para desarrollo aislado:
 
 ```bash
 ./gradlew bootRun
 ```
 
-## OpenAPI
+Para la solucion completa se recomienda levantar el proyecto desde la raiz con Docker Compose.
+
+## Testing
+
+```bash
+./gradlew test jacocoTestCoverageVerification
+```
+
+## Contrato
+
+El contrato OpenAPI fuente vive en:
 
 - [openapi.yml](/Users/facevedo/Documents/challenge-tenpo/api-calculator/src/main/resources/static/openapi.yml)
 
-La documentacion se expone como archivo OpenAPI estatico para reducir dependencias runtime no esenciales del challenge.
+Y queda accesible desde la stack completa en:
+
+- `http://localhost/openapi.yml`
+- `http://localhost:8082`
+
+## Pruebas locales con mocks
+
+La API acepta el header opcional `X-Mock-Scenario` para pruebas controladas con `api-mocks`.
+
+Valores soportados:
+
+- `success`
+- `retry-success`
+- `error`

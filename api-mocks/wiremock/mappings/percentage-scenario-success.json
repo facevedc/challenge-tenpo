@@ -1,0 +1,21 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/external/percentage",
+    "headers": {
+      "X-Mock-Scenario": {
+        "equalTo": "success"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "percentage": 10
+    }
+  }
+}

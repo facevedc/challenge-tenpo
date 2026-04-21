@@ -5,6 +5,8 @@ spring:
     web-application-type: reactive
   jackson:
     default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
 
 server:
   port: ${SERVER_PORT:8080}
@@ -28,16 +30,16 @@ info:
     name: ${spring.application.name}
     description: API reactiva para challenge Tenpo
     version: 1.0.0
+    instance-id: ${HOSTNAME:unknown}
 
 tenpo:
   client:
     percentage:
       base-url: ${PERCENTAGE_BASE_URL:http://localhost:8081}
-      path: /external/percentage
+      max-attempts: 3
+      retry-delay-millis: 100
   cache:
     percentage-ttl-minutes: 30
-  rate-limit:
-    requests-per-minute: 3
 
 logging:
   structured:

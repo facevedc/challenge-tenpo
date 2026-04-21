@@ -26,11 +26,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     implementation 'org.postgresql:r2dbc-postgresql:1.1.0.RELEASE'
     implementation 'io.r2dbc:r2dbc-pool'
-
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
@@ -45,10 +45,9 @@ dependencies {
 def coverageExclusions = [
     'tenpo/*Application.class',
     'tenpo/settings/**',
-    'tenpo/api/package-info.class',
-    'tenpo/domain/package-info.class',
-    'tenpo/infrastructure/package-info.class',
-    'tenpo/settings/package-info.class'
+    'tenpo/api/common/**',
+    'tenpo/api/**/dto/**',
+    'tenpo/domain/**/model/**'
 ]
 
 test {
