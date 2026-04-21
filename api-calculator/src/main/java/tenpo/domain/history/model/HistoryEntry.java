@@ -12,6 +12,10 @@ public class HistoryEntry {
     private final OffsetDateTime createdAt;
     private final String endpoint;
     private final String httpMethod;
-    private final String requestSummary;
-    private final String outcome;
+    private final String queryParams;
+    private final String requestBody;
+    private final Integer responseStatus;
+    private final String responseBody;
+    private final String errorMessage;
+    private final Long durationMs;
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import tenpo.domain.history.HistoryPersistence;
 
 @SpringBootTest(properties = {
         "spring.autoconfigure.exclude=" +
@@ -17,6 +18,9 @@ class CalculatorApplicationTests {
 
     @MockitoBean
     private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
+
+    @MockitoBean
+    private HistoryPersistence historyPersistence;
 
     @Test
     void contextLoads() {

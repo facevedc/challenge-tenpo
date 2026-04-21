@@ -61,8 +61,12 @@ class HistoryHandlerTest {
                 OffsetDateTime.parse("2026-04-19T10:15:30Z"),
                 "/api/v1/calculations",
                 "GET",
-                "num1=5&num2=7",
-                "SUCCESS"
+                "{\"num1\":\"5\",\"num2\":\"7\"}",
+                null,
+                200,
+                "{\"final_amount\":13.2}",
+                null,
+                15L
         );
 
         when(historyQueryService.findHistory(new HistoryQuery(0, 20)))
@@ -80,8 +84,11 @@ class HistoryHandlerTest {
                 .jsonPath("$.items[0].id").isEqualTo(1)
                 .jsonPath("$.items[0].endpoint").isEqualTo("/api/v1/calculations")
                 .jsonPath("$.items[0].http_method").isEqualTo("GET")
-                .jsonPath("$.items[0].request_summary").isEqualTo("num1=5&num2=7")
-                .jsonPath("$.items[0].outcome").isEqualTo("SUCCESS");
+                .jsonPath("$.items[0].query_params.num1").isEqualTo("5")
+                .jsonPath("$.items[0].query_params.num2").isEqualTo("7")
+                .jsonPath("$.items[0].response_status").isEqualTo(200)
+                .jsonPath("$.items[0].response_body.final_amount").isEqualTo(13.2)
+                .jsonPath("$.items[0].duration_ms").isEqualTo(15);
     }
 
     @Test

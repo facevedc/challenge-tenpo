@@ -13,14 +13,18 @@ import tenpo.domain.calculation.exception.PercentageUnavailableException;
 public class GlobalExceptionHandler {
 
     public Mono<ServerResponse> handle(Throwable throwable) {
-        HttpStatus status = throwable instanceof BadRequestException
-                ? HttpStatus.BAD_REQUEST
-                : throwable instanceof PercentageUnavailableException
-                ? HttpStatus.SERVICE_UNAVAILABLE
-                : HttpStatus.INTERNAL_SERVER_ERROR;
+        HttpStatus status = resolveStatus(throwable);
 
         return ServerResponse.status(status)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new ModelError(status.value(), status.name(), throwable.getMessage(), List.of()));
+    }
+
+    public HttpStatus resolveStatus(Throwable throwable) {
+        return throwable instanceof BadRequestException
+                ? HttpStatus.BAD_REQUEST
+                : throwable instanceof PercentageUnavailableException
+                ? HttpStatus.SERVICE_UNAVAILABLE
+                : HttpStatus.INTERNAL_SERVER_ERROR;
     }
 }

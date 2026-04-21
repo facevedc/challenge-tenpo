@@ -4,12 +4,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import tenpo.api.common.error.GlobalExceptionHandler;
 
-public class CommonHandler {
+public abstract class CommonHandler {
 
     private final GlobalExceptionHandler globalExceptionHandler;
 
-    public CommonHandler() {
-        this.globalExceptionHandler = new GlobalExceptionHandler();
+    protected CommonHandler(GlobalExceptionHandler globalExceptionHandler) {
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
     protected Mono<ServerResponse> executeHandler(Mono<?> execution) {
