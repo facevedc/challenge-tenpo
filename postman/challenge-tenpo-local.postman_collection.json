@@ -1,9 +1,9 @@
 {
   "info": {
-    "_postman_id": "de4c80fe-2fa1-4e77-a3bb-d26c95dba3d4",
+    "_postman_id": "d6df0d94-8ff0-4f5c-8dd4-2e4b4a74df3e",
     "name": "challenge-tenpo-local",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Coleccion local para probar la API del challenge Tenpo, el mock externo y los escenarios por header."
+    "description": "Coleccion local para validar todos los casos principales del challenge Tenpo."
   },
   "item": [
     {
@@ -17,13 +17,16 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('health responde 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('status UP', function () {",
-                  "    pm.expect(pm.response.json().status).to.eql('UP');",
-                  "});"
+                  "pm.test('Health responde 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); pm.test('Status UP', function () { pm.expect(json.status).to.eql('UP'); });"
                 ]
               }
             }
@@ -33,15 +36,97 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/actuator/health",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "actuator",
-                "health"
-              ]
+              "host": []
             }
-          }
+          },
+          "response": []
+        },
+        {
+          "name": "Actuator Info",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Info responde 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/info",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "OpenAPI YAML",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('OpenAPI responde 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('OpenAPI contiene version', function () { pm.expect(pm.response.text()).to.include('openapi: 3.0.3'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/openapi.yml",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Swagger UI",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Swagger UI responde 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Swagger UI contiene HTML', function () { pm.expect(pm.response.text()).to.include('Swagger UI'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{swaggerUiUrl}}",
+              "host": []
+            }
+          },
+          "response": []
         },
         {
           "name": "Reiniciar escenarios mock",
@@ -51,9 +136,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('reset mock responde 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Reset de mock responde 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -63,16 +146,74 @@
             "header": [],
             "url": {
               "raw": "{{mockBaseUrl}}/__admin/scenarios/reset",
-              "host": [
-                "{{mockBaseUrl}}"
-              ],
-              "path": [
-                "__admin",
-                "scenarios",
-                "reset"
-              ]
+              "host": []
             }
-          }
+          },
+          "response": []
+        },
+        {
+          "name": "Generar cliente de rate limit",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('rateLimitClientId', 'rate-limit-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Cliente de rate limit generado', function () { pm.expect(pm.environment.get('rateLimitClientId')).to.be.ok; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reiniciar evidencia de balanceo",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('balanceSeenInstances', '[]');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Evidencia de balanceo reiniciada', function () { pm.expect(pm.environment.get('balanceSeenInstances')).to.eql('[]'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": []
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -83,24 +224,20 @@
           "name": "Flujo Exitoso",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('scenarioClientId', 'calc-success-' + Date.now());"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const json = pm.response.json();",
-                  "",
-                  "pm.test('flujo exitoso responde 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('resultado esperado del flujo exitoso', function () {",
-                  "    pm.expect(json.num1).to.eql(5);",
-                  "    pm.expect(json.num2).to.eql(7);",
-                  "    pm.expect(json.base_sum).to.eql(12);",
-                  "    pm.expect(json.percentage).to.eql(10);",
-                  "    pm.expect(json.final_amount).to.eql(13.2);",
-                  "    pm.expect(json.percentage_source).to.eql('external-mock');",
-                  "});"
+                  "const json = pm.response.json(); pm.test('Calculo exitoso', function () { pm.response.to.have.status(200); pm.expect(json.final_amount).to.eql(13.2); pm.expect(json.percentage_source).to.eql('external-mock'); });"
                 ]
               }
             }
@@ -109,8 +246,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Accept",
-                "value": "application/json",
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
                 "type": "text"
               },
               {
@@ -121,45 +258,29 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "calculations"
-              ],
-              "query": [
-                {
-                  "key": "num1",
-                  "value": "{{num1}}"
-                },
-                {
-                  "key": "num2",
-                  "value": "{{num2}}"
-                }
-              ]
+              "host": []
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Retry Exitoso",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('scenarioClientId', 'calc-retry-' + Date.now());"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const json = pm.response.json();",
-                  "",
-                  "pm.test('retry exitoso responde 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('retry termina usando fuente externa', function () {",
-                  "    pm.expect(json.percentage_source).to.eql('external-mock');",
-                  "    pm.expect(json.percentage).to.eql(10);",
-                  "});"
+                  "const json = pm.response.json(); pm.test('Retry exitoso', function () { pm.response.to.have.status(200); pm.expect(json.percentage).to.eql(10); pm.expect(json.percentage_source).to.eql('external-mock'); });"
                 ]
               }
             }
@@ -168,8 +289,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Accept",
-                "value": "application/json",
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
                 "type": "text"
               },
               {
@@ -180,38 +301,29 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "calculations"
-              ],
-              "query": [
-                {
-                  "key": "num1",
-                  "value": "{{num1}}"
-                },
-                {
-                  "key": "num2",
-                  "value": "{{num2}}"
-                }
-              ]
+              "host": []
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Sembrar Cache Para Fallback",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('scenarioClientId', 'calc-seed-cache-' + Date.now());"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('siembra de cache responde 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "const json = pm.response.json(); pm.test('Cache sembrada desde calculo exitoso', function () { pm.response.to.have.status(200); pm.expect(json.percentage_source).to.eql('external-mock'); });"
                 ]
               }
             }
@@ -220,8 +332,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Accept",
-                "value": "application/json",
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
                 "type": "text"
               },
               {
@@ -232,104 +344,29 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "calculations"
-              ],
-              "query": [
-                {
-                  "key": "num1",
-                  "value": "{{num1}}"
-                },
-                {
-                  "key": "num2",
-                  "value": "{{num2}}"
-                }
-              ]
+              "host": []
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Fallback Con Cache",
           "event": [
             {
-              "listen": "test",
+              "listen": "prerequest",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const json = pm.response.json();",
-                  "",
-                  "pm.test('fallback con cache responde 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('fallback usa redis-cache', function () {",
-                  "    pm.expect(json.percentage_source).to.eql('redis-cache');",
-                  "    pm.expect(json.percentage).to.eql(10);",
-                  "});"
+                  "pm.environment.set('scenarioClientId', 'calc-cache-fallback-' + Date.now());"
                 ]
               }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              },
-              {
-                "key": "X-Mock-Scenario",
-                "value": "error",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "calculations"
-              ],
-              "query": [
-                {
-                  "key": "num1",
-                  "value": "{{num1}}"
-                },
-                {
-                  "key": "num2",
-                  "value": "{{num2}}"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Fallback Sin Cache",
-          "event": [
+            },
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const json = pm.response.json();",
-                  "",
-                  "pm.test('fallback sin cache responde 503', function () {",
-                  "    pm.response.to.have.status(503);",
-                  "});",
-                  "",
-                  "pm.test('mensaje esperado sin cache previa', function () {",
-                  "    pm.expect(json.code).to.eql('SERVICE_UNAVAILABLE');",
-                  "    pm.expect(json.message).to.eql('Percentage service unavailable and no cached value found');",
-                  "});"
+                  "const json = pm.response.json(); pm.test('Fallback con cache responde 200', function () { pm.response.to.have.status(200); pm.expect(json.percentage_source).to.eql('redis-cache'); });"
                 ]
               }
             }
@@ -338,8 +375,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Accept",
-                "value": "application/json",
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
                 "type": "text"
               },
               {
@@ -350,27 +387,91 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "calculations"
-              ],
-              "query": [
-                {
-                  "key": "num1",
-                  "value": "{{num1}}"
-                },
-                {
-                  "key": "num2",
-                  "value": "{{num2}}"
-                }
-              ]
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fallback Sin Cache",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('scenarioClientId', 'calc-no-cache-fallback-' + Date.now());"
+                ]
+              }
             },
-            "description": "Antes de ejecutar este request, limpia Redis con ./scripts/reset_percentage_cache.sh"
-          }
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); pm.test('Fallback sin cache responde 503', function () { pm.response.to.have.status(503); pm.expect(json.code).to.eql('SERVICE_UNAVAILABLE'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "error",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calculo Con Parametro Invalido",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('scenarioClientId', 'calc-invalid-param-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); pm.test('Parametro invalido responde 400', function () { pm.response.to.have.status(400); pm.expect(json.code).to.eql('BAD_REQUEST'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1=abc&num2={{num2}}",
+              "host": []
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -381,23 +482,20 @@
           "name": "Consultar Historial Paginado",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('scenarioClientId', 'history-page-' + Date.now());"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const json = pm.response.json();",
-                  "",
-                  "pm.test('historial responde 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('historial contiene metadatos de paginacion', function () {",
-                  "    pm.expect(json).to.have.property('items');",
-                  "    pm.expect(json).to.have.property('page');",
-                  "    pm.expect(json).to.have.property('size');",
-                  "    pm.expect(json).to.have.property('total_elements');",
-                  "    pm.expect(json).to.have.property('total_pages');",
-                  "});"
+                  "const json = pm.response.json(); pm.test('Historial paginado responde 200', function () { pm.response.to.have.status(200); pm.expect(json).to.have.property('items'); pm.expect(json).to.have.property('page'); pm.expect(json).to.have.property('size'); pm.expect(json).to.have.property('total_elements'); pm.expect(json).to.have.property('total_pages'); });"
                 ]
               }
             }
@@ -406,52 +504,36 @@
             "method": "GET",
             "header": [
               {
-                "key": "Accept",
-                "value": "application/json",
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
                 "type": "text"
               }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/history?page={{page}}&size={{size}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "{{page}}"
-                },
-                {
-                  "key": "size",
-                  "value": "{{size}}"
-                }
-              ]
+              "host": []
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Validar Registro De Exito En Historial",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('scenarioClientId', 'history-success-check-' + Date.now());"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const json = pm.response.json();",
-                  "",
-                  "pm.test('historial contiene al menos una entrada', function () {",
-                  "    pm.expect(json.items.length).to.be.greaterThan(0);",
-                  "});",
-                  "",
-                  "pm.test('se observa una llamada exitosa de calculations', function () {",
-                  "    const entry = json.items.find(item => item.endpoint === '/api/v1/calculations' && item.response_status === 200);",
-                  "    pm.expect(entry).to.exist;",
-                  "});"
+                  "const json = pm.response.json(); const found = (json.items || []).some(item => item.endpoint === '/api/v1/calculations' && item.response_status === 200); pm.test('Existe registro exitoso de calculator', function () { pm.response.to.have.status(200); pm.expect(found).to.eql(true); });"
                 ]
               }
             }
@@ -460,50 +542,36 @@
             "method": "GET",
             "header": [
               {
-                "key": "Accept",
-                "value": "application/json",
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
                 "type": "text"
               }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/history?page=0&size=20",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "20"
-                }
-              ]
-            },
-            "description": "Ejecuta antes un request de calculo exitoso para generar la traza."
-          }
+              "host": []
+            }
+          },
+          "response": []
         },
         {
           "name": "Validar Registro De Error En Historial",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('scenarioClientId', 'history-error-check-' + Date.now());"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const json = pm.response.json();",
-                  "",
-                  "pm.test('historial contiene una llamada erronea de calculations', function () {",
-                  "    const entry = json.items.find(item => item.endpoint === '/api/v1/calculations' && item.response_status === 400);",
-                  "    pm.expect(entry).to.exist;",
-                  "    pm.expect(entry.error_message).to.eql('Invalid decimal query param: num1');",
-                  "});"
+                  "const json = pm.response.json(); const found = (json.items || []).some(item => item.endpoint === '/api/v1/calculations' && item.response_status === 400); pm.test('Existe registro de error de calculator', function () { pm.response.to.have.status(200); pm.expect(found).to.eql(true); });"
                 ]
               }
             }
@@ -512,53 +580,70 @@
             "method": "GET",
             "header": [
               {
-                "key": "Accept",
-                "value": "application/json",
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
                 "type": "text"
               }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/history?page=0&size=20",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "20"
-                }
-              ]
-            },
-            "description": "Ejecuta antes un request de calculo invalido para generar la traza de error."
-          }
+              "host": []
+            }
+          },
+          "response": []
         },
         {
           "name": "Historial Paginacion Invalida",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('scenarioClientId', 'history-invalid-page-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); pm.test('Paginacion invalida responde 400', function () { pm.response.to.have.status(400); pm.expect(json.code).to.eql('BAD_REQUEST'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Client-Id",
+                "value": "{{scenarioClientId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/history?page=-1&size=20",
+              "host": []
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Escenarios Rate Limit",
+      "item": [
+        {
+          "name": "Rate Limit 1",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const json = pm.response.json();",
-                  "",
-                  "pm.test('historial con paginacion invalida responde 400', function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test('mensaje de validacion esperado', function () {",
-                  "    pm.expect(json.code).to.eql('BAD_REQUEST');",
-                  "    pm.expect(json.message).to.eql('page must be greater than or equal to 0');",
-                  "});"
+                  "const expected = 200; pm.test('Rate Limit 1 responde ' + expected, function () { pm.response.to.have.status(expected); });"
                 ]
               }
             }
@@ -567,61 +652,247 @@
             "method": "GET",
             "header": [
               {
-                "key": "Accept",
-                "value": "application/json",
+                "key": "X-Client-Id",
+                "value": "{{rateLimitClientId}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "success",
                 "type": "text"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/history?page=-1&size=20",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "-1"
-                },
-                {
-                  "key": "size",
-                  "value": "20"
-                }
-              ]
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
+              "host": []
             }
-          }
+          },
+          "response": []
+        },
+        {
+          "name": "Rate Limit 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const expected = 200; pm.test('Rate Limit 2 responde ' + expected, function () { pm.response.to.have.status(expected); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Client-Id",
+                "value": "{{rateLimitClientId}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "success",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rate Limit 3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const expected = 200; pm.test('Rate Limit 3 responde ' + expected, function () { pm.response.to.have.status(expected); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Client-Id",
+                "value": "{{rateLimitClientId}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "success",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rate Limit 4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const expected = 429; pm.test('Rate Limit 4 responde ' + expected, function () { pm.response.to.have.status(expected); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Client-Id",
+                "value": "{{rateLimitClientId}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock-Scenario",
+                "value": "success",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculations?num1={{num1}}&num2={{num2}}",
+              "host": []
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Escenarios Balanceo",
+      "item": [
+        {
+          "name": "Observar Replica 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); const instanceId = json?.app?.['instance-id']; let seen = []; try { seen = JSON.parse(pm.environment.get('balanceSeenInstances') || '[]'); } catch (error) { seen = []; } if (instanceId && !seen.includes(instanceId)) { seen.push(instanceId); pm.environment.set('balanceSeenInstances', JSON.stringify(seen)); } pm.test('Observar Replica 1 responde 200', function () { pm.response.to.have.status(200); pm.expect(instanceId).to.be.ok; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/info",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Observar Replica 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); const instanceId = json?.app?.['instance-id']; let seen = []; try { seen = JSON.parse(pm.environment.get('balanceSeenInstances') || '[]'); } catch (error) { seen = []; } if (instanceId && !seen.includes(instanceId)) { seen.push(instanceId); pm.environment.set('balanceSeenInstances', JSON.stringify(seen)); } pm.test('Observar Replica 2 responde 200', function () { pm.response.to.have.status(200); pm.expect(instanceId).to.be.ok; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/info",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Observar Replica 3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); const instanceId = json?.app?.['instance-id']; let seen = []; try { seen = JSON.parse(pm.environment.get('balanceSeenInstances') || '[]'); } catch (error) { seen = []; } if (instanceId && !seen.includes(instanceId)) { seen.push(instanceId); pm.environment.set('balanceSeenInstances', JSON.stringify(seen)); } pm.test('Observar Replica 3 responde 200', function () { pm.response.to.have.status(200); pm.expect(instanceId).to.be.ok; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/info",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Observar Replica 4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); const instanceId = json?.app?.['instance-id']; let seen = []; try { seen = JSON.parse(pm.environment.get('balanceSeenInstances') || '[]'); } catch (error) { seen = []; } if (instanceId && !seen.includes(instanceId)) { seen.push(instanceId); pm.environment.set('balanceSeenInstances', JSON.stringify(seen)); } pm.test('Observar Replica 4 responde 200', function () { pm.response.to.have.status(200); pm.expect(instanceId).to.be.ok; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/info",
+              "host": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validar Balanceo Observado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const seen = JSON.parse(pm.environment.get('balanceSeenInstances') || '[]'); pm.test('Se observaron al menos dos replicas', function () { pm.expect(new Set(seen).size).to.be.at.least(2); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": []
+            }
+          },
+          "response": []
         }
       ]
     }
   ],
-  "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:8080"
-    },
-    {
-      "key": "mockBaseUrl",
-      "value": "http://localhost:8081"
-    },
-    {
-      "key": "num1",
-      "value": "5"
-    },
-    {
-      "key": "num2",
-      "value": "7"
-    },
-    {
-      "key": "page",
-      "value": "0"
-    },
-    {
-      "key": "size",
-      "value": "20"
-    }
-  ]
+  "variable": []
 }

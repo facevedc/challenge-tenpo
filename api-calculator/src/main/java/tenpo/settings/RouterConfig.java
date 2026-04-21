@@ -18,14 +18,15 @@ public class RouterConfig {
     public RouterFunction<ServerResponse> calculationRoutes(CalculationHandler calculationHandler) {
         return route(GET("/api/v1/calculations")
                 .and(request -> request.headers().accept().isEmpty()
-                        || request.headers().accept().contains(MediaType.APPLICATION_JSON)), calculationHandler::calculate);
+                        || request.headers().accept().stream()
+                        .anyMatch(mediaType -> mediaType.isCompatibleWith(MediaType.APPLICATION_JSON))), calculationHandler::calculate);
     }
 
     @Bean
     public RouterFunction<ServerResponse> historyRoutes(HistoryHandler historyHandler) {
         return route(GET("/api/v1/history")
                 .and(request -> request.headers().accept().isEmpty()
-                        || request.headers().accept().contains(MediaType.APPLICATION_JSON)), historyHandler::getHistory);
+                        || request.headers().accept().stream()
+                        .anyMatch(mediaType -> mediaType.isCompatibleWith(MediaType.APPLICATION_JSON))), historyHandler::getHistory);
     }
 }
-

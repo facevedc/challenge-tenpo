@@ -27,12 +27,10 @@ import tenpo.domain.history.model.HistoryPage;
 import tenpo.domain.history.model.HistoryQuery;
 import tenpo.settings.JacksonConfig;
 import tenpo.settings.RouterConfig;
-import tenpo.settings.SwaggerConfig;
 
 @WebFluxTest
 @Import({
         JacksonConfig.class,
-        SwaggerConfig.class,
         RouterConfig.class,
         HistoryHandler.class,
         HistoryValidation.class,

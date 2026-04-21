@@ -2,10 +2,25 @@ spring:
   main:
     web-application-type: reactive
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/tenpo_challenge?schema=tenpo
-    username: tenpo
-    password: tenpo_secret
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:tenpo_challenge}
+    username: ${DB_USERNAME:tenpo}
+    password: ${DB_PASSWORD:tenpo_secret}
+    properties:
+      schema: ${TENPO_DB_SCHEMA:tenpo}
+      applicationName: ${TENPO_DB_APPLICATION_NAME:api-calculator}
+    pool:
+      enabled: true
+      initial-size: ${TENPO_DB_POOL_INITIAL_SIZE:2}
+      min-idle: ${TENPO_DB_POOL_MIN_IDLE:2}
+      max-size: ${TENPO_DB_POOL_MAX_SIZE:10}
+      max-idle-time: ${TENPO_DB_POOL_MAX_IDLE_TIME:30m}
+      max-life-time: ${TENPO_DB_POOL_MAX_LIFE_TIME:30m}
+      max-acquire-time: ${TENPO_DB_POOL_MAX_ACQUIRE_TIME:5s}
+      max-create-connection-time: ${TENPO_DB_POOL_MAX_CREATE_CONNECTION_TIME:5s}
+      max-validation-time: ${TENPO_DB_POOL_MAX_VALIDATION_TIME:2s}
+      validation-query: ${TENPO_DB_POOL_VALIDATION_QUERY:SELECT 1}
+      validation-depth: ${TENPO_DB_POOL_VALIDATION_DEPTH:remote}
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}

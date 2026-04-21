@@ -1,12 +1,9 @@
 # Infrastructure
 
-Esta capa queda reservada para adaptadores concretos de integración externa.
+Esta capa contiene los adaptadores concretos de integracion externa del servicio.
 
-En esta iteración ya vive aquí:
+Hoy vive aqui:
 
-- `MockPercentageClient` para consumir el mock externo del porcentaje dinámico
+- `MockPercentageClient` para consumir el servicio mock de porcentaje
 - `RedisPercentageCacheStore` para persistir el porcentaje distribuido en Redis con TTL
-
-En las próximas iteraciones deberían agregarse además:
-
-- `PostgresRepository` para historial de llamadas
+- `PostgresHistoryPersistence` y `ApiCallHistoryRepository` para persistir y consultar historial en PostgreSQL

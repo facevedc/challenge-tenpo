@@ -3,12 +3,16 @@ package tenpo.domain.history;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import tenpo.domain.history.model.HistoryLogCommand;
 
 @Slf4j
 @Service
 public class DefaultHistoryRegistrationService implements HistoryRegistrationService {
+
+    private static final Scheduler HISTORY_REGISTRATION_SCHEDULER =
+            Schedulers.newSingle("history-registration");
 
     private final HistoryPersistence historyPersistence;
 
@@ -22,7 +26,7 @@ public class DefaultHistoryRegistrationService implements HistoryRegistrationSer
                 historyLogCommand.endpoint(), historyLogCommand.responseStatus());
 
         historyPersistence.save(historyLogCommand)
-                .subscribeOn(Schedulers.boundedElastic())
+                .subscribeOn(HISTORY_REGISTRATION_SCHEDULER)
                 .doOnSuccess(ignored -> log.info("Completed async history registration for endpoint={} status={}",
                         historyLogCommand.endpoint(), historyLogCommand.responseStatus()))
                 .onErrorResume(throwable -> {
