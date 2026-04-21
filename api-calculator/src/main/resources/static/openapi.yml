@@ -2,13 +2,15 @@ openapi: 3.0.3
 info:
   title: Tenpo Challenge Calculator API
   version: 1.0.0
-  description: API REST reactiva para calcular suma con porcentaje dinamico e historial de llamadas.
+  description: API REST reactiva para calcular una suma con porcentaje dinamico, cache distribuido e historial de invocaciones.
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost
+    description: Proxy local por Nginx
 paths:
   /api/v1/calculations:
     get:
       summary: Calcula la suma de dos numeros aplicando un porcentaje adicional
+      description: Obtiene el porcentaje desde un servicio externo mock, con retry y fallback a Redis cuando corresponde.
       parameters:
         - in: query
           name: num1
@@ -16,12 +18,21 @@ paths:
           schema:
             type: number
             format: double
+          example: 5
         - in: query
           name: num2
           required: true
           schema:
             type: number
             format: double
+          example: 7
+        - in: header
+          name: X-Mock-Scenario
+          required: false
+          description: Header opcional para pruebas locales con api-mocks.
+          schema:
+            type: string
+            enum: [success, retry-success, error]
       responses:
         '200':
           description: Resultado del calculo
@@ -29,32 +40,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CalculationResponse'
-              example:
-                num1: 5
-                num2: 7
-                base_sum: 12
-                percentage: 10
-                final_amount: 13.2
-                percentage_source: external-mock
+              examples:
+                external:
+                  summary: Porcentaje obtenido desde el servicio externo
+                  value:
+                    num1: 5
+                    num2: 7
+                    base_sum: 12
+                    percentage: 10
+                    final_amount: 13.2
+                    percentage_source: external-mock
+                cache:
+                  summary: Porcentaje resuelto desde Redis
+                  value:
+                    num1: 5
+                    num2: 7
+                    base_sum: 12
+                    percentage: 10
+                    final_amount: 13.2
+                    percentage_source: redis-cache
         '400':
           description: Parametros invalidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '429':
-          description: Rate limit excedido
+          description: Rate limit excedido en Nginx
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Dependencia externa, cache o persistencia no disponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
-          description: Error interno
+          description: Error interno no controlado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/history:
     get:
-      summary: Consulta paginada del historial de invocaciones
+      summary: Consulta paginada del historial de invocaciones de calculator
+      description: Devuelve solo las trazas registradas para /api/v1/calculations.
       parameters:
         - in: query
           name: page
+          required: false
           schema:
             type: integer
+            minimum: 0
             default: 0
         - in: query
           name: size
+          required: false
           schema:
             type: integer
+            minimum: 1
             default: 20
       responses:
         '200':
@@ -63,10 +109,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HistoryResponse'
+              example:
+                items:
+                  - id: 1
+                    created_at: '2026-04-21T03:15:30Z'
+                    endpoint: /api/v1/calculations
+                    http_method: GET
+                    query_params:
+                      num1: '5'
+                      num2: '7'
+                    response_status: 200
+                    response_body:
+                      num1: 5
+                      num2: 7
+                      base_sum: 12
+                      percentage: 10
+                      final_amount: 13.2
+                      percentage_source: external-mock
+                    duration_ms: 15
+                page: 0
+                size: 20
+                total_elements: 1
+                total_pages: 1
+        '400':
+          description: Paginacion invalida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit excedido en Nginx
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Persistencia no disponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno no controlado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CalculationResponse:
       type: object
+      required:
+        - num1
+        - num2
+        - base_sum
+        - percentage
+        - final_amount
+        - percentage_source
       properties:
         num1:
           type: number
@@ -85,15 +184,16 @@ components:
           format: double
         percentage_source:
           type: string
-      example:
-        num1: 5
-        num2: 7
-        base_sum: 12
-        percentage: 10
-        final_amount: 13.2
-        percentage_source: external-mock
+          enum: [external-mock, redis-cache]
     HistoryEntryResponse:
       type: object
+      required:
+        - id
+        - created_at
+        - endpoint
+        - http_method
+        - response_status
+        - duration_ms
       properties:
         id:
           type: integer
@@ -105,12 +205,28 @@ components:
           type: string
         http_method:
           type: string
-        request_summary:
+        query_params:
+          $ref: '#/components/schemas/JsonValue'
+        request_body:
+          $ref: '#/components/schemas/JsonValue'
+        response_status:
+          type: integer
+        response_body:
+          $ref: '#/components/schemas/JsonValue'
+        error_message:
           type: string
-        outcome:
-          type: string
+          nullable: true
+        duration_ms:
+          type: integer
+          format: int64
     HistoryResponse:
       type: object
+      required:
+        - items
+        - page
+        - size
+        - total_elements
+        - total_pages
       properties:
         items:
           type: array
@@ -125,3 +241,37 @@ components:
           format: int64
         total_pages:
           type: integer
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - code
+        - message
+        - errors
+      properties:
+        status:
+          type: integer
+        code:
+          type: string
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+      example:
+        status: 400
+        code: BAD_REQUEST
+        message: Invalid decimal query param: num1
+        errors: []
+    JsonValue:
+      nullable: true
+      oneOf:
+        - type: object
+          additionalProperties: true
+        - type: array
+          items: {}
+        - type: string
+        - type: number
+        - type: integer
+        - type: boolean

@@ -65,6 +65,7 @@ services:
           memory: 256M
 
   api-calculator:
+    image: ${API_CALCULATOR_IMAGE:-facevedc/challenge-tenpo-api-calculator:latest}
     build:
       context: ./api-calculator
     restart: unless-stopped
@@ -83,6 +84,18 @@ services:
       DB_NAME: tenpo_challenge
       DB_USERNAME: tenpo
       DB_PASSWORD: tenpo_secret
+      TENPO_DB_SCHEMA: tenpo
+      TENPO_DB_APPLICATION_NAME: api-calculator
+      TENPO_DB_POOL_INITIAL_SIZE: 2
+      TENPO_DB_POOL_MIN_IDLE: 2
+      TENPO_DB_POOL_MAX_SIZE: 10
+      TENPO_DB_POOL_MAX_IDLE_TIME: 30m
+      TENPO_DB_POOL_MAX_LIFE_TIME: 30m
+      TENPO_DB_POOL_MAX_ACQUIRE_TIME: 5s
+      TENPO_DB_POOL_MAX_CREATE_CONNECTION_TIME: 5s
+      TENPO_DB_POOL_MAX_VALIDATION_TIME: 2s
+      TENPO_DB_POOL_VALIDATION_QUERY: SELECT 1
+      TENPO_DB_POOL_VALIDATION_DEPTH: remote
       REDIS_HOST: redis
       REDIS_PORT: 6379
       PERCENTAGE_BASE_URL: http://api-mocks:8080
@@ -108,6 +121,26 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./api-calculator/src/main/resources/static/openapi.yml:/usr/share/nginx/html/openapi.yml:ro
+    networks:
+      - challenge-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+
+  swagger-ui:
+    container_name: challenge-tenpo-swagger-ui
+    image: swaggerapi/swagger-ui:latest
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+    environment:
+      SWAGGER_JSON: /tmp/openapi.yml
+      BASE_URL: /
+    volumes:
+      - ./api-calculator/src/main/resources/static/openapi.yml:/tmp/openapi.yml:ro
     networks:
       - challenge-net
     deploy:
