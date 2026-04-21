@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
@@ -127,5 +128,19 @@ class HistoryHandlerTest {
                 .expectBody()
                 .jsonPath("$.code").isEqualTo("BAD_REQUEST")
                 .jsonPath("$.message").isEqualTo("page must be greater than or equal to 0");
+    }
+
+    @Test
+    void shouldReturnServiceUnavailableWhenHistoryPersistenceFails() {
+        when(historyQueryService.findHistory(new HistoryQuery(0, 20)))
+                .thenReturn(Mono.error(new DataAccessResourceFailureException("postgres down")));
+
+        webTestClient.get()
+                .uri("/api/v1/history?page=0&size=20")
+                .exchange()
+                .expectStatus().isEqualTo(503)
+                .expectBody()
+                .jsonPath("$.code").isEqualTo("SERVICE_UNAVAILABLE")
+                .jsonPath("$.message").isEqualTo("Persistence service temporarily unavailable");
     }
 }
