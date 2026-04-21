@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -186,5 +187,41 @@ class CalculationHandlerTest {
                 .jsonPath("$.message").isEqualTo("Percentage service unavailable and no cached value found");
 
         verify(historyRegistrationService, timeout(1000)).register(any(HistoryLogCommand.class));
+    }
+
+    @Test
+    void shouldReturnInternalServerErrorWithoutLeakingInternalMessage() {
+        when(calculationService.calculate(new CalculationCommand(new BigDecimal("5"), new BigDecimal("7"))))
+                .thenReturn(Mono.error(new RuntimeException("sensitive internal detail")));
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/api/v1/calculations")
+                        .queryParam("num1", "5")
+                        .queryParam("num2", "7")
+                        .build())
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.code").isEqualTo("INTERNAL_SERVER_ERROR")
+                .jsonPath("$.message").isEqualTo("Unexpected internal server error");
+
+        verify(historyRegistrationService, timeout(1000)).register(any(HistoryLogCommand.class));
+    }
+
+    @Test
+    void shouldReturnServiceUnavailableForExternalClientFailures() {
+        when(calculationService.calculate(new CalculationCommand(new BigDecimal("5"), new BigDecimal("7"))))
+                .thenReturn(Mono.error(new DataAccessResourceFailureException("db unavailable")));
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/api/v1/calculations")
+                        .queryParam("num1", "5")
+                        .queryParam("num2", "7")
+                        .build())
+                .exchange()
+                .expectStatus().isEqualTo(503)
+                .expectBody()
+                .jsonPath("$.code").isEqualTo("SERVICE_UNAVAILABLE")
+                .jsonPath("$.message").isEqualTo("Persistence service temporarily unavailable");
     }
 }
