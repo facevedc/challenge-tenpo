@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -23,17 +22,8 @@ class PostgresHistoryPersistenceTest {
 
     @Test
     void shouldPersistHistoryLogCommand() {
-        when(apiCallHistoryRepository.insertHistory(
-                any(LocalDateTime.class),
-                any(String.class),
-                any(String.class),
-                any(),
-                any(),
-                any(Integer.class),
-                any(),
-                any(),
-                any(Long.class)
-        )).thenReturn(Mono.just(1));
+        when(apiCallHistoryRepository.save(any(ApiCallHistoryEntity.class)))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
 
         StepVerifier.create(postgresHistoryPersistence.save(new HistoryLogCommand(
                         OffsetDateTime.parse("2026-04-19T10:15:30Z"),
@@ -52,7 +42,7 @@ class PostgresHistoryPersistenceTest {
     void shouldReturnPagedHistoryFromRepository() {
         ApiCallHistoryEntity apiCallHistoryEntity = new ApiCallHistoryEntity(
                 1L,
-                LocalDateTime.parse("2026-04-19T10:15:30"),
+                java.time.LocalDateTime.parse("2026-04-19T10:15:30"),
                 "/api/v1/calculations",
                 "GET",
                 "{\"num1\":\"5\",\"num2\":\"7\"}",

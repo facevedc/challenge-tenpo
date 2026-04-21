@@ -21,19 +21,7 @@ public class PostgresHistoryPersistence implements HistoryPersistence {
 
     @Override
     public Mono<Void> save(HistoryLogCommand historyLogCommand) {
-        ApiCallHistoryEntity entity = toEntity(historyLogCommand);
-
-        return apiCallHistoryRepository.insertHistory(
-                entity.getCreatedAt(),
-                entity.getEndpoint(),
-                entity.getHttpMethod(),
-                entity.getQueryParams(),
-                entity.getRequestBody(),
-                entity.getResponseStatus(),
-                entity.getResponseBody(),
-                entity.getErrorMessage(),
-                entity.getDurationMs()
-        ).then();
+        return apiCallHistoryRepository.save(toEntity(historyLogCommand)).then();
     }
 
     @Override
