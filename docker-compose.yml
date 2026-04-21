@@ -65,9 +65,7 @@ services:
           memory: 256M
 
   api-calculator:
-    image: ${API_CALCULATOR_IMAGE:-facevedc/challenge-tenpo-api-calculator:latest}
-    build:
-      context: ./api-calculator
+    image: ${API_CALCULATOR_IMAGE:-felipeacevedo91/challenge-tenpo-api-calculator:latest}
     restart: unless-stopped
     depends_on:
       postgres:

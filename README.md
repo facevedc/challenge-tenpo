@@ -34,7 +34,8 @@ El repositorio parte desde un skeleton propio, alineado a una cultura de desarro
 ## Levantar el proyecto
 
 ```bash
-docker compose up -d --build
+docker compose pull api-calculator
+docker compose up -d
 ```
 
 Verifica que la stack este operativa:
@@ -46,6 +47,11 @@ open http://localhost:8082
 ```
 
 ## Scripts utiles
+
+Prerequisito:
+```bash
+chmod -R +x ./scripts
+```
 
 - `./scripts/reset_mock_scenarios.sh`: reinicia el estado de WireMock.
 - `./scripts/reset_percentage_cache.sh`: limpia el porcentaje cacheado en Redis.
@@ -224,15 +230,15 @@ La guia detallada de uso esta en [postman/README.md](./postman/README.md).
 
 ## Imagen Docker de la API
 
-La API se construye localmente con este nombre:
+La imagen publica de Docker Hub queda disponible en:
 
-- `facevedc/challenge-tenpo-api-calculator:latest`
+- `felipeacevedo91/challenge-tenpo-api-calculator:latest`
 
 Tambien deje etiquetada la version:
 
-- `facevedc/challenge-tenpo-api-calculator:1.0.0`
+- `felipeacevedo91/challenge-tenpo-api-calculator:1.0.0`
 
-`docker-compose.yml` ya esta preparado para usar esa imagen por defecto en `api-calculator`.
+`docker-compose.yml` ya esta preparado para usar esa imagen publica por defecto en `api-calculator`, sin necesidad de `build`.
 
 ## Estrategia tecnica
 
