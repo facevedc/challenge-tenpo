@@ -1,5 +1,8 @@
 package tenpo.api.calculation;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -23,6 +26,8 @@ import tenpo.domain.calculation.CalculationService;
 import tenpo.domain.calculation.exception.PercentageUnavailableException;
 import tenpo.domain.calculation.model.CalculationCommand;
 import tenpo.domain.calculation.model.CalculationResult;
+import tenpo.domain.history.HistoryRegistrationService;
+import tenpo.domain.history.model.HistoryLogCommand;
 import tenpo.settings.HttpHeaderConstants;
 import tenpo.settings.JacksonConfig;
 import tenpo.settings.RouterConfig;
@@ -54,6 +59,9 @@ class CalculationHandlerTest {
     @MockitoBean
     private HistoryHandler historyHandler;
 
+    @MockitoBean
+    private HistoryRegistrationService historyRegistrationService;
+
     @Test
     void shouldReturnCalculationContract() {
         when(calculationService.calculate(new CalculationCommand(new BigDecimal("5"), new BigDecimal("7"))))
@@ -80,6 +88,8 @@ class CalculationHandlerTest {
                 .jsonPath("$.percentage").isEqualTo(10)
                 .jsonPath("$.final_amount").isEqualTo(13.2)
                 .jsonPath("$.percentage_source").isEqualTo("external-mock");
+
+        verify(historyRegistrationService, timeout(1000)).register(any(HistoryLogCommand.class));
     }
 
     @Test
@@ -174,5 +184,7 @@ class CalculationHandlerTest {
                 .expectBody()
                 .jsonPath("$.code").isEqualTo("SERVICE_UNAVAILABLE")
                 .jsonPath("$.message").isEqualTo("Percentage service unavailable and no cached value found");
+
+        verify(historyRegistrationService, timeout(1000)).register(any(HistoryLogCommand.class));
     }
 }
