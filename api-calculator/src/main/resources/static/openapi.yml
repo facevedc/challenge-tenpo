@@ -262,7 +262,7 @@ components:
       example:
         status: 400
         code: BAD_REQUEST
-        message: Invalid decimal query param: num1
+        message: 'Invalid decimal query param: num1'
         errors: []
     JsonValue:
       nullable: true
