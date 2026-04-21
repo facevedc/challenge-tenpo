@@ -4,13 +4,13 @@ Mocks del servicio externo que entrega el porcentaje adicional.
 
 ## Implementacion
 
-Se usa WireMock en contenedor para mantener el repo simple, portable y facil de probar.
+Se usa WireMock en contenedor para mantener el proyecto simple, portable y reproducible.
 
-## Endpoint mock principal
+## Endpoint principal
 
 - `GET /external/percentage`
 
-Respuesta esperada inicial:
+Respuesta base:
 
 ```json
 {
@@ -18,32 +18,31 @@ Respuesta esperada inicial:
 }
 ```
 
-## Casos pensados para pruebas
+## Escenarios soportados
 
-- escenario `success`
-- escenario `retry-success`
-- escenario `error`
+- `success`
+- `retry-success`
+- `error`
 
-## Seleccion de escenario por header
+## Seleccion de escenario
 
-El mock cambia su comportamiento segun el header opcional:
+El comportamiento cambia segun el header opcional:
 
 - `X-Mock-Scenario: success`
 - `X-Mock-Scenario: retry-success`
 - `X-Mock-Scenario: error`
 
-Si no se envia el header, responde el escenario exitoso por defecto.
+Si el header no se envia, el mock responde el flujo exitoso por defecto.
 
 ## Reinicio de escenarios
 
-Para reiniciar el estado de WireMock:
-
-```bash
-curl -X POST http://localhost:8081/__admin/scenarios/reset
-```
-
-O bien:
-
 ```bash
 ./scripts/reset_mock_scenarios.sh
+```
+
+## Verificacion rapida
+
+```bash
+curl -sS -H 'X-Mock-Scenario: success' http://localhost:8081/external/percentage
+curl -sS -H 'X-Mock-Scenario: error' http://localhost:8081/external/percentage
 ```
