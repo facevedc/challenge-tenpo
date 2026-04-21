@@ -39,8 +39,6 @@ tenpo:
       retry-delay-millis: 100
   cache:
     percentage-ttl-minutes: 30
-  rate-limit:
-    requests-per-minute: 3
 
 logging:
   structured:
